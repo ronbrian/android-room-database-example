@@ -1,20 +1,40 @@
-package net.simplifiedcoding.mytodo;
+package com.ron.mytodo.uis;
 
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Toast;
 
-public class UpdateTaskActivity extends AppCompatActivity {
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
 
-    private EditText editTextTask, editTextDesc, editTextFinishBy;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
+import com.ron.mytodo.Database.DatabaseClient;
+import com.ron.mytodo.model.Task;
+import com.ron.mytodo.rest.UserService;
+
+import net.simplifiedcoding.mytodo.R;
+
+import okhttp3.OkHttpClient;
+import retrofit2.Call;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
+
+public class UpdateTaskActivity extends AppCompatActivity implements OnMapReadyCallback {
+
+    private EditText editTextTask, editTextDesc, editTextFinishBy, editTextLocation;
     private CheckBox checkBoxFinished;
+
+
 
 
     @Override
@@ -22,10 +42,17 @@ public class UpdateTaskActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_update_task);
 
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
+                .findFragmentById(R.id.map);
+        mapFragment.getMapAsync(this);
+
+
+
 
         editTextTask = findViewById(R.id.editTextTask);
         editTextDesc = findViewById(R.id.editTextDesc);
         editTextFinishBy = findViewById(R.id.editTextFinishBy);
+        editTextLocation = findViewById(R.id.editTextLocation);
 
         checkBoxFinished = findViewById(R.id.checkBoxFinished);
 
@@ -45,6 +72,7 @@ public class UpdateTaskActivity extends AppCompatActivity {
         findViewById(R.id.button_delete).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
 
                 AlertDialog.Builder builder = new AlertDialog.Builder(UpdateTaskActivity.this);
                 builder.setTitle("Are you sure?");
@@ -69,8 +97,9 @@ public class UpdateTaskActivity extends AppCompatActivity {
 
     private void loadTask(Task task) {
         editTextTask.setText(task.getTask());
-        editTextDesc.setText(task.getDesc());
+        editTextDesc.setText(task.getDescription());
         editTextFinishBy.setText(task.getFinishBy());
+        editTextLocation.setText(task.getLocation());
         checkBoxFinished.setChecked(task.isFinished());
     }
 
@@ -78,6 +107,8 @@ public class UpdateTaskActivity extends AppCompatActivity {
         final String sTask = editTextTask.getText().toString().trim();
         final String sDesc = editTextDesc.getText().toString().trim();
         final String sFinishBy = editTextFinishBy.getText().toString().trim();
+        final String sLocation = editTextLocation.getText().toString().trim();
+
 
         if (sTask.isEmpty()) {
             editTextTask.setError("Task required");
@@ -102,12 +133,20 @@ public class UpdateTaskActivity extends AppCompatActivity {
             @Override
             protected Void doInBackground(Void... voids) {
                 task.setTask(sTask);
-                task.setDesc(sDesc);
+                task.setDescription(sDesc);
                 task.setFinishBy(sFinishBy);
+                task.setFinishBy(sLocation);
                 task.setFinished(checkBoxFinished.isChecked());
                 DatabaseClient.getInstance(getApplicationContext()).getAppDatabase()
                         .taskDao()
                         .update(task);
+
+
+
+
+
+
+
                 return null;
             }
 
@@ -133,6 +172,30 @@ public class UpdateTaskActivity extends AppCompatActivity {
                 DatabaseClient.getInstance(getApplicationContext()).getAppDatabase()
                         .taskDao()
                         .delete(task);
+
+
+                OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
+
+                Retrofit retrofit = new Retrofit.Builder()
+                        .baseUrl("http://192.168.1.148:9786/")
+                        .addConverterFactory(GsonConverterFactory.create())
+                        .client(httpClient.build())
+                        .build();
+
+                UserService service = retrofit.create(UserService.class);
+
+                // Calling '/api/users/2'
+                Call callSync = service.deleteTask(task);
+                try {
+                    callSync.execute();
+                } catch (Exception e) {
+
+
+                }
+
+
+
+
                 return null;
             }
 
@@ -150,4 +213,22 @@ public class UpdateTaskActivity extends AppCompatActivity {
 
     }
 
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        String locationCoord = editTextLocation.getText().toString();
+
+        String[] output = locationCoord.split(",");
+
+        double lat= Double.valueOf(output[0]);
+        double longg= Double.valueOf(output[1]);
+
+
+
+        LatLng sydney = new LatLng(lat, longg);
+        googleMap.addMarker(new MarkerOptions().position(sydney)
+                .title("Your Location"));
+        googleMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+        googleMap.setMinZoomPreference(15);
+
+    }
 }

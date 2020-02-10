@@ -1,54 +1,62 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:background="@drawable/rounded_corner"
 
-    <android.support.v7.widget.CardView
-        android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <androidx.cardview.widget.CardView
+        android:layout_width="402dp"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="3dp">
+        android:layout_margin="10dp"
+        android:background="@color/colorPrimary"
+        android:padding="7dp"
+        app:cardCornerRadius="8dp"
+        app:cardElevation="8dp">
 
         <LinearLayout
+            android:id="@+id/linearLayout1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:background="@drawable/rounded_corner"
             android:orientation="vertical"
-            android:padding="7dp">
+            android:padding="1dp">
 
             <TextView
+
                 android:id="@+id/textViewStatus"
-                android:layout_width="match_parent"
+                android:layout_width="168dp"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="5dp"
-                android:background="@color/colorPrimaryDark"
+                android:textColorHighlight="@color/colorAccent"
+                android:padding="1dp"
                 android:text="Completed"
                 android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium"
-                android:textColor="@color/colorLight"
+                android:textColor="@color/colorAccent"
                 android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/textViewTask"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Go Bring Eggs"
-                android:textAppearance="@style/Base.TextAppearance.AppCompat.Headline" />
+                android:padding="5dp"
+                android:text="Buy MacBook"
+                android:textAppearance="@style/Base.TextAppearance.AppCompat.Headline"
+                android:textColor="@color/backgroundBlack" />
 
             <TextView
                 android:id="@+id/textViewDesc"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Bring 6 eggs from super market"
-                android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium" />
-
-            <TextView
-                android:id="@+id/textViewFinishBy"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="5pm today"
-                android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium" />
+                android:padding="5dp"
+                android:text="Buy from Apple Shop"
+                android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium"
+                android:textColor="@color/backgroundBlack" />
 
 
         </LinearLayout>
 
-    </android.support.v7.widget.CardView>
+    </androidx.cardview.widget.CardView>
 
 </RelativeLayout>

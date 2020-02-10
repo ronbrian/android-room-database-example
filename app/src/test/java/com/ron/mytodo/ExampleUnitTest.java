@@ -1,4 +1,4 @@
-package net.simplifiedcoding.mytodo;
+package com.ron.mytodo;
 
 import org.junit.Test;
 

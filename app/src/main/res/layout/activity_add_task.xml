@@ -4,40 +4,76 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".AddTaskActivity">
+    android:background="@color/colorAccent"
+    tools:context="com.ron.mytodo.uis.AddTaskActivity">
+    <TextView
+
+        android:id="@+id/txtView"
+        android:layout_width="wrap_content"
+        android:layout_height="74dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginStart="5dp"
+        android:layout_marginLeft="5dp"
+        android:layout_marginTop="29dp"
+        android:layout_marginEnd="6dp"
+        android:layout_marginRight="6dp"
+        android:layout_marginBottom="5dp"
+        android:padding="1dp"
+        android:text="Add Task"
+        android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium"
+        android:textColor="@color/colorPrimary"
+        android:textSize="30dp"
+        android:textStyle="bold" />
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_centerVertical="true"
+        android:layout_height="653dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginTop="78dp"
+        android:layout_marginBottom="0dp"
+        android:background="@color/colorPrimary"
         android:orientation="vertical"
         android:padding="16dp">
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="15dp"
-            android:text="Add a Task"
-            android:textAlignment="center"
-            android:textAppearance="@style/Base.TextAppearance.AppCompat.Headline" />
 
         <EditText
             android:id="@+id/editTextTask"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="task?" />
+            android:hint="Task" />
 
         <EditText
             android:id="@+id/editTextDesc"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="description..." />
+            android:hint=" Description " />
 
         <EditText
             android:id="@+id/editTextFinishBy"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="finish by?" />
+            android:hint=" Finish By ? " />
+
+        <EditText
+            android:id="@+id/editTextLocation"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:editable="false"
+
+            tools:ignore="Deprecated" />
+
+
+
+        <fragment
+            android:id="@+id/autocomplete_fragment"
+            android:name="com.google.android.libraries.places.widget.AutocompleteSupportFragment"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+
+
 
         <Button
             android:id="@+id/button_save"
@@ -45,11 +81,25 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="15dp"
-            android:background="@color/colorPrimary"
+            android:background="@color/colorAccent"
             android:text="Save"
+            android:textColor="@color/colorPrimary"
             android:textAllCaps="false"
-            android:textColor="@color/colorLight" />
+             />
 
     </LinearLayout>
+
+    <TextView
+        android:id="@+id/textView1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginEnd="180dp"
+        android:layout_marginRight="180dp"
+        android:layout_marginBottom="155dp"
+        android:visibility="invisible"
+         />
 
 </RelativeLayout>

@@ -4,46 +4,118 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".UpdateTaskActivity">
+    android:background="@color/colorAccent"
+    tools:context="com.ron.mytodo.uis.UpdateTaskActivity">
+
+
+    <TextView
+
+        android:id="@+id/textViewStatus"
+        android:layout_width="wrap_content"
+        android:layout_height="74dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginStart="5dp"
+        android:layout_marginLeft="5dp"
+        android:layout_marginTop="29dp"
+        android:layout_marginEnd="6dp"
+        android:layout_marginRight="6dp"
+        android:layout_marginBottom="5dp"
+        android:padding="1dp"
+        android:text="Edit Task"
+        android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium"
+        android:textColor="@color/colorPrimary"
+        android:textSize="30dp"
+        android:textStyle="bold" />
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_centerVertical="true"
+        android:layout_height="653dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginTop="77dp"
+        android:layout_marginBottom="1dp"
+        android:background="@color/colorPrimary"
         android:orientation="vertical"
         android:padding="16dp">
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="15dp"
-            android:text="Update Task"
-            android:textAlignment="center"
-            android:textAppearance="@style/Base.TextAppearance.AppCompat.Headline" />
 
-        <EditText
-            android:id="@+id/editTextTask"
+        <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="task?" />
+            android:layout_height="wrap_content">
 
-        <EditText
-            android:id="@+id/editTextDesc"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="description..." />
 
-        <EditText
-            android:id="@+id/editTextFinishBy"
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/editTextTask"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint=" Task " />
+
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+
+        <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="finish by?" />
+            android:layout_height="wrap_content">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/editTextDesc"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint=" Description " />
+
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/editTextFinishBy"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Due by ?" />
+
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/editTextLocation"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:editable="false"
+                android:hint="Location" />
+
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+
+
+
+
 
         <CheckBox
             android:id="@+id/checkBoxFinished"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Mark as finished" />
+            android:layout_below="@+id/editTextFinishBy"
+            android:text="Have you completed this Task ?" />
+
+
+        <fragment
+            android:id="@+id/map"
+            android:name="com.google.android.gms.maps.SupportMapFragment"
+            android:layout_width="match_parent"
+            android:layout_height="234dp"
+            tools:context="com.example.mapwithmarker.MapsMarkerActivity" />
 
         <Button
             android:id="@+id/button_update"
@@ -51,7 +123,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="15dp"
-            android:background="@color/colorPrimary"
+            android:background="@color/colorAccent"
             android:text="Update"
             android:textAllCaps="false"
             android:textColor="@color/colorLight" />
