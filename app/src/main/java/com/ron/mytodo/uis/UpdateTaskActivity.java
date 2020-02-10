@@ -211,6 +211,8 @@ public class UpdateTaskActivity extends AppCompatActivity implements OnMapReadyC
         DeleteTask dt = new DeleteTask();
         dt.execute();
 
+
+
     }
 
     @Override
