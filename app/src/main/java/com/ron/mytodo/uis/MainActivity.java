@@ -5,6 +5,7 @@ import android.content.res.Configuration;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.AutoCompleteTextView;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
@@ -20,6 +21,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.ron.mytodo.Adapters.TasksAdapter;
 import com.ron.mytodo.Database.DatabaseClient;
+import com.ron.mytodo.MyPlacesAdapter;
 import com.ron.mytodo.allTasks;
 import com.ron.mytodo.model.Task;
 import com.ron.mytodo.rest.ApiClient;
@@ -36,6 +38,9 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class MainActivity extends AppCompatActivity {
+
+    AutoCompleteTextView places;
+    MyPlacesAdapter adapter;
 
     private FloatingActionButton buttonAddTask;
     private FloatingActionButton buttonloadTasks;
@@ -114,6 +119,8 @@ public class MainActivity extends AppCompatActivity {
                         .getAppDatabase()
                         .taskDao()
                         .getAll();
+
+
 
 
 

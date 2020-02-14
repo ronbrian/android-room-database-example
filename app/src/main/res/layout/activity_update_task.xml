@@ -23,7 +23,7 @@
         android:layout_marginRight="6dp"
         android:layout_marginBottom="5dp"
         android:padding="1dp"
-        android:text="Edit Task"
+        android:text="Edit"
         android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium"
         android:textColor="@color/colorPrimary"
         android:textSize="30dp"
@@ -85,14 +85,32 @@
 
         <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="1dp">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/editTextLocation"
                 android:layout_width="match_parent"
+                android:visibility="invisible"
+                android:layout_height="wrap_content"
+                
+                android:editable="false"
+                 />
+
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/editTextLocationDesc"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:editable="false"
-                android:hint="Location" />
+                android:hint="Location"
+                />
 
 
         </com.google.android.material.textfield.TextInputLayout>
@@ -115,7 +133,7 @@
             android:name="com.google.android.gms.maps.SupportMapFragment"
             android:layout_width="match_parent"
             android:layout_height="234dp"
-            tools:context="com.example.mapwithmarker.MapsMarkerActivity" />
+            />
 
         <Button
             android:id="@+id/button_update"

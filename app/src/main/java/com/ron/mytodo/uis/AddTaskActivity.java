@@ -5,44 +5,72 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.Address;
-import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.google.android.gms.common.api.Status;
-import com.google.android.libraries.places.api.Places;
-import com.google.android.libraries.places.api.model.Place;
-import com.google.android.libraries.places.api.net.PlacesClient;
-import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
-import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.PolylineOptions;
 import com.ron.mytodo.Database.DatabaseClient;
+import com.ron.mytodo.DirectionsJSONParser;
+import com.ron.mytodo.MyGooglePlaces;
+import com.ron.mytodo.MyPlacesAdapter;
 import com.ron.mytodo.model.Task;
 import com.ron.mytodo.rest.UserService;
 
 import net.simplifiedcoding.mytodo.R;
 
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
 import java.io.IOException;
-import java.util.Arrays;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 
 import okhttp3.OkHttpClient;
 import retrofit2.Call;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class AddTaskActivity extends AppCompatActivity implements LocationListener {
+public class AddTaskActivity extends AppCompatActivity implements LocationListener, OnMapReadyCallback {
+    private GoogleMap mMap;
+
+    AutoCompleteTextView places,places2;
+    MyPlacesAdapter adapter;
+
+
     String TAG = "placeautocomplete";
     TextView txtView;
     String LocationLatLng, locationCoord ;
@@ -57,9 +85,16 @@ public class AddTaskActivity extends AppCompatActivity implements LocationListen
     protected boolean gps_enabled, network_enabled;
     public String location;
     List<Address> addresses;
+    Double latitude1, longitude1;
+    public LatLng myLocation, myLocation2;
+    Marker[] markers;
+
+    MarkerOptions options = new MarkerOptions();
+    MarkerOptions options2 = new MarkerOptions();
 
 
     private EditText editTextTask, editTextDesc, editTextFinishBy, editTextLocation;
+    private ImageView imageviewLocationIcon1, imageviewLocationIcon;
 
     @SuppressLint("MissingPermission")
     @Override
@@ -67,75 +102,9 @@ public class AddTaskActivity extends AppCompatActivity implements LocationListen
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_task);
 
-        txtView = findViewById(R.id.txtView);
-
-
-
-
-
-
-
-
-
-        // Initialize Places.
-        Places.initialize(getApplicationContext(), "AIzaSyDTQ67ZZMnns_OlsSKe5qPqiqmeKRJuBSg");
-        // Create a new Places client instance.
-        PlacesClient placesClient = Places.createClient(this);
-
-        // Initialize the AutocompleteSupportFragment.
-        AutocompleteSupportFragment autocompleteFragment = (AutocompleteSupportFragment)
-                getSupportFragmentManager().findFragmentById(R.id.autocomplete_fragment);
-
-        // Specify the types of place data to return.
-        autocompleteFragment.setPlaceFields(Arrays.asList(Place.Field.ID, Place.Field.NAME, Place.Field.LAT_LNG));
-
-        // Set up a PlaceSelectionListener to handle the response.
-        autocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
-            @Override
-            public void onPlaceSelected(Place place) {
-                // TODO: Get info about the selected place.
-                Toast.makeText(AddTaskActivity.this, ""+place.getLatLng(), Toast.LENGTH_SHORT).show();
-                //editTextLocation.setText(place.getName());
-                LocationLatLng = place.getLatLng().toString();
-
-
-
-                String[] output = LocationLatLng.split(" ");
-                //System.out.println(output[0]);
-                //System.out.println(output[1]);
-                locationCoord= output[1];
-                locationCoord = locationCoord.replace("(", "");
-                locationCoord = locationCoord.replace(")", "");
-
-                editTextLocation.setText(locationCoord);
-
-
-
-                Log.i(TAG, "Place: " + place.getName() + ", " + place.getId());
-            }
-
-            @Override
-            public void onError(Status status) {
-                // TODO: Handle the error.
-                Log.i(TAG, "An error occurred: " + status);
-            }
-
-
-
-
-        });
-
-
-
-
-
-
-
-
-
-
-
-
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
+                .findFragmentById(R.id.map);
+        mapFragment.getMapAsync(this);
 
 
 
@@ -145,6 +114,136 @@ public class AddTaskActivity extends AppCompatActivity implements LocationListen
         editTextDesc = findViewById(R.id.editTextDesc);
         editTextFinishBy = findViewById(R.id.editTextFinishBy);
         editTextLocation = findViewById(R.id.editTextLocation);
+        imageviewLocationIcon = findViewById(R.id.imageView2);
+        imageviewLocationIcon1 = findViewById(R.id.imageView1);
+
+
+
+        places=(AutoCompleteTextView)findViewById(R.id.places);
+        places2=(AutoCompleteTextView)findViewById(R.id.places2);
+
+        places2.setVisibility(View.GONE);//makes it disappear
+        imageviewLocationIcon.setVisibility(View.GONE);//makes it disappear
+        imageviewLocationIcon1.setVisibility(View.GONE);//makes it disappear
+
+
+        adapter=new MyPlacesAdapter(AddTaskActivity.this);
+        places.setAdapter(adapter);
+        places2.setAdapter(adapter);
+        textChange();
+
+        // handling click of autotextcompleteview items
+        places.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                MyGooglePlaces googlePlaces=(MyGooglePlaces)parent.getItemAtPosition(position);
+                places.setText(googlePlaces.getName());
+
+
+                myLocation = new LatLng(googlePlaces.getLat(),googlePlaces.getLng());
+
+
+
+                mMap.moveCamera(CameraUpdateFactory.newLatLng(myLocation));
+                //mMap.setMinZoomPreference(15);
+
+                options.position(myLocation);
+                options.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
+                mMap.addMarker(options.title(googlePlaces.getName())).showInfoWindow();
+
+
+
+                places2.setVisibility(View.VISIBLE);//makes it reappear
+                imageviewLocationIcon.setVisibility(View.VISIBLE);//makes it disappear
+                imageviewLocationIcon1.setVisibility(View.VISIBLE);//makes it disappear
+
+
+
+
+
+
+            }
+        });
+
+        places2.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                MyGooglePlaces googlePlaces=(MyGooglePlaces)parent.getItemAtPosition(position);
+                places2.setText(googlePlaces.getName());
+
+                myLocation2 = new LatLng(googlePlaces.getLat(),googlePlaces.getLng());
+
+
+
+                //mMap.moveCamera(CameraUpdateFactory.newLatLng(myLocation2));
+                //mMap.setMinZoomPreference(12);
+
+                options2.position(myLocation2);
+                options2.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
+                mMap.addMarker(options2.title(googlePlaces.getName())).showInfoWindow();
+
+
+                LatLng origin = myLocation;
+                LatLng dest = myLocation2;
+
+                String url = getDirectionsUrl(origin, dest);
+
+                DownloadTask downloadTask = new DownloadTask();
+
+                downloadTask.execute(url);
+/*
+                LatLngBounds.Builder builder = new LatLngBounds.Builder();
+
+                //the include method will calculate the min and max bound.
+                builder.include(options.getPosition());
+                builder.include(options2.getPosition());
+
+                LatLngBounds bounds = builder.build();
+
+                int width = getResources().getDisplayMetrics().widthPixels;
+                int height = getResources().getDisplayMetrics().heightPixels;
+                int padding = (int) (width * 0.40); // offset from edges of the map 10% of screen
+
+                CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, width, height, padding);
+
+                mMap.animateCamera(cu);*/
+
+                LatLngBounds.Builder builder = new LatLngBounds.Builder();
+                builder.include(origin);
+                builder.include(dest);
+
+                int width = getResources().getDisplayMetrics().widthPixels;
+                int height = getResources().getDisplayMetrics().heightPixels;
+                int padding = (int) (width * 0.10); // offset from edges of the map 10% of screen
+
+
+                LatLngBounds NAIROBI = builder.build();
+
+                mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(NAIROBI,width,height,padding));
+
+
+                Double dist = CalculationByDistance(origin, dest);
+
+
+
+
+       /*         LatLngBounds NAIROBI = new LatLngBounds(
+                        new LatLng(origin.longitude,origin.latitude), new LatLng(dest.longitude,dest));
+                mMap.setLatLngBoundsForCameraTarget(NAIROBI);*/
+
+                // Set the camera to the greatest possible zoom level that includes the
+                // bounds
+
+
+
+
+            }
+        });
+
+
+
+
+        txtView = findViewById(R.id.txtView);
 
 
 
@@ -175,34 +274,84 @@ public class AddTaskActivity extends AppCompatActivity implements LocationListen
 
 
 
+    private void textChange() {
+        // text changed listener to get results precisely according to our search
+        places.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                //calling getfilter to filter the results
+                adapter.getFilter().filter(s);
+                //notify the adapters after results changed
+                adapter.notifyDataSetChanged();
+            }
+            @Override
+            public void afterTextChanged(Editable s) {
+            }
+        });
+    }
+
+
+
+
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return true;
+    }
+
+
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.action_settings) {
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+
+
+
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        mMap = googleMap;
+        mMap.setMyLocationEnabled(true);
+        mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+        mMap.getUiSettings().setMapToolbarEnabled(true);
+
+        //LatLng myLocation = new LatLng(-1.2937,36.7981);
+        //mMap.moveCamera(CameraUpdateFactory.newLatLng(myLocation));
+        mMap.setMinZoomPreference(6.0f);
+        //mMap.setMaxZoomPreference(14.0f);
+
+         //LatLngBounds NAIROBI = new LatLngBounds(
+                //new LatLng(-1.429104,36.606102), new LatLng(-1.165157,37.095337));
+        //mMap.setLatLngBoundsForCameraTarget(NAIROBI);
+
+        // Set the camera to the greatest possible zoom level that includes the
+        // bounds
+        //mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(NAIROBI, 0));
+
+
+    }
+
     @Override
     public void onLocationChanged(Location location) {
-        txtLat = (TextView) findViewById(R.id.textView1);
-        txtLat.setText("Latitude:" + location.getLatitude() + ", Longitude:" + location.getLongitude());
         this.location = location.getLatitude()+", "+location.getLongitude();
 
 
-        double latitude1 = location.getLatitude();
-        double longitude1 = location.getLongitude();
-
-        Geocoder geocoder = new Geocoder(this, Locale.getDefault());
-        try {
-            addresses = geocoder.getFromLocation(latitude1, longitude1, 1);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-
-
-        for(Address addresses1 : addresses ){
-
-
-
-            //editTextLocation.setText(addresses1.getAddressLine(0));
-
-        }
-
-
+         latitude1 = location.getLatitude();
+         longitude1 = location.getLongitude();
 
 
     }
@@ -221,11 +370,6 @@ public class AddTaskActivity extends AppCompatActivity implements LocationListen
     public void onStatusChanged(String provider, int status, Bundle extras) {
         Log.d("Latitude", "status");
     }
-
-
-
-
-
 
 
 
@@ -340,6 +484,205 @@ public class AddTaskActivity extends AppCompatActivity implements LocationListen
 
 
 
+
+
+
+    private class DownloadTask extends AsyncTask<String, Void, String> {
+
+        @Override
+        protected String doInBackground(String... url) {
+
+            String data = "";
+
+            try {
+                data = downloadUrl(url[0]);
+            } catch (Exception e) {
+                Log.d("Background Task", e.toString());
+            }
+            return data;
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            super.onPostExecute(result);
+
+            ParserTask parserTask = new ParserTask();
+
+
+            parserTask.execute(result);
+
+
+
+        }
+    }
+
+
+
+
+    /**
+     * A class to parse the Google Places in JSON format
+     */
+    private class ParserTask extends AsyncTask<String, Integer, List<List<HashMap<String, String>>>> {
+
+        // Parsing the data in non-ui thread
+        @Override
+        protected List<List<HashMap<String, String>>> doInBackground(String... jsonData) {
+
+            JSONObject jObject;
+            List<List<HashMap<String, String>>> routes = null;
+
+            try {
+                jObject = new JSONObject(jsonData[0]);
+                DirectionsJSONParser parser = new DirectionsJSONParser();
+
+                routes = parser.parse(jObject);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return routes;
+        }
+
+        @Override
+        protected void onPostExecute(List<List<HashMap<String, String>>> result) {
+            ArrayList points = null;
+            PolylineOptions lineOptions = null;
+            MarkerOptions markerOptions = new MarkerOptions();
+
+            for (int i = 0; i < result.size(); i++) {
+                points = new ArrayList();
+                lineOptions = new PolylineOptions();
+
+                List<HashMap<String, String>> path = result.get(0);
+
+                for (int j = 0; j < path.size(); j++) {
+                    HashMap<String, String> point = path.get(j);
+
+                    double lat = Double.parseDouble(point.get("lat"));
+                    double lng = Double.parseDouble(point.get("lng"));
+                    LatLng  position = new LatLng(lat, lng);
+
+                    points.add(position);
+                }
+
+                lineOptions.addAll(points);
+                lineOptions.width(12);
+                lineOptions.color(Color.RED);
+                lineOptions.geodesic(false);
+
+                //lineOptions.addAll(points);
+
+            }
+
+// Drawing polyline in the Google Map for the i-th route
+            //mMap.addPolyline(lineOptions);
+
+
+            if(points.size()!=0)mMap.addPolyline(lineOptions);//to avoid crash
+
+
+        }
+
+
+
+    }
+
+
+
+
+
+
+    private String getDirectionsUrl(LatLng origin, LatLng dest) {
+
+        // Origin of route
+        String str_origin = "origin=" + origin.latitude + "," + origin.longitude;
+
+        // Destination of route
+        String str_dest = "destination=" + dest.latitude + "," + dest.longitude;
+
+        // Sensor enabled
+        String sensor = "sensor=false";
+        String mode = "mode=driving";
+        // Building the parameters to the web service
+        String parameters = str_origin + "&" + str_dest + "&" + sensor + "&" + mode;
+
+        // Output format
+        String output = "json";
+
+        // Building the url to the web service
+        String url = "https://maps.googleapis.com/maps/api/directions/" + output + "?" + parameters+"&key=AIzaSyDTQ67ZZMnns_OlsSKe5qPqiqmeKRJuBSg";
+
+
+        return url;
+    }
+
+
+
+
+
+    /*  Method to download JSON DATA FROM URL  */
+
+    private String downloadUrl(String strUrl) throws IOException {
+        String data = "";
+        InputStream iStream = null;
+        HttpURLConnection urlConnection = null;
+        try {
+            URL url = new URL(strUrl);
+
+            urlConnection = (HttpURLConnection) url.openConnection();
+
+            urlConnection.connect();
+
+            iStream = urlConnection.getInputStream();
+
+            BufferedReader br = new BufferedReader(new InputStreamReader(iStream));
+
+            StringBuffer sb = new StringBuffer();
+
+            String line = "";
+            while ((line = br.readLine()) != null) {
+                sb.append(line);
+            }
+
+            data = sb.toString();
+
+            br.close();
+
+        } catch (Exception e) {
+            Log.d("Exception", e.toString());
+        } finally {
+            iStream.close();
+            urlConnection.disconnect();
+        }
+        return data;
+    }
+
+
+
+
+    public double CalculationByDistance(LatLng StartP, LatLng EndP) {
+        int Radius = 6371;// radius of earth in Km
+        double lat1 = StartP.latitude;
+        double lat2 = EndP.latitude;
+        double lon1 = StartP.longitude;
+        double lon2 = EndP.longitude;
+        double dLat = Math.toRadians(lat2 - lat1);
+        double dLon = Math.toRadians(lon2 - lon1);
+        double a = Math.sin(dLat / 2) * Math.sin(dLat / 2)
+                + Math.cos(Math.toRadians(lat1))
+                * Math.cos(Math.toRadians(lat2)) * Math.sin(dLon / 2)
+                * Math.sin(dLon / 2);
+        double c = 2 * Math.asin(Math.sqrt(a));
+        double valueResult = Radius * c;
+        double km = valueResult / 1;
+        DecimalFormat newFormat = new DecimalFormat("####");
+        int kmInDec = Integer.valueOf(newFormat.format(km));
+        double meter = valueResult % 1000;
+        int meterInDec = Integer.valueOf(newFormat.format(meter));
+        Log.i("Radius Value", "" + valueResult + "   KM  " + kmInDec
+                + " Meter   " + meterInDec);
+
+        return Radius * c;
+    }
 
 
 
