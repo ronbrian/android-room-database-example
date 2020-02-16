@@ -27,6 +27,7 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -293,10 +294,6 @@ public class AddTaskActivity extends AppCompatActivity implements LocationListen
         });
     }
 
-
-
-
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -325,13 +322,24 @@ public class AddTaskActivity extends AppCompatActivity implements LocationListen
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-        mMap.setMyLocationEnabled(true);
-        mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
-        mMap.getUiSettings().setMapToolbarEnabled(true);
+        //mMap.setMyLocationEnabled(true);
+        //mMap.getUiSettings().setMapToolbarEnabled(true);
 
-        //LatLng myLocation = new LatLng(-1.2937,36.7981);
+
+        mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+        LatLng myLocation = new LatLng(-1.2937,36.7981);
         //mMap.moveCamera(CameraUpdateFactory.newLatLng(myLocation));
-        mMap.setMinZoomPreference(6.0f);
+
+        CameraUpdate center= CameraUpdateFactory.newLatLng(new LatLng(myLocation.latitude,myLocation.longitude));
+
+        CameraUpdate zoom=CameraUpdateFactory.zoomTo(15);
+
+        mMap.moveCamera(center);
+        mMap.animateCamera(zoom);
+
+
+
+        //mMap.setMinZoomPreference(15);
         //mMap.setMaxZoomPreference(14.0f);
 
          //LatLngBounds NAIROBI = new LatLngBounds(
