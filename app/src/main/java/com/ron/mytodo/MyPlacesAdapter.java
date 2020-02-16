@@ -118,7 +118,8 @@ public class MyPlacesAdapter extends BaseAdapter implements Filterable, Location
 
         String API_KEY="AIzaSyDTQ67ZZMnns_OlsSKe5qPqiqmeKRJuBSg";
 
-        String url="https://maps.googleapis.com/maps/api/place/textsearch/json?query="+constraint+"&key="+API_KEY;
+        //String url="https://maps.googleapis.com/maps/api/place/textsearch/json?query="+constraint+"&key="+API_KEY;
+        String url="https://maps.googleapis.com/maps/api/place/findplacefromtext/json?input="+constraint+"&inputtype=textquery&fields=name,geometry,formatted_address&key="+API_KEY;
 
         return getPlaces(url);
 
@@ -165,8 +166,8 @@ public class MyPlacesAdapter extends BaseAdapter implements Filterable, Location
             // make an jsonObject in order to parse the response
             JSONObject jsonObject = new JSONObject(response);
             // make an jsonObject in order to parse the response
-            if (jsonObject.has("results")) {
-                JSONArray jsonArray = jsonObject.getJSONArray("results");
+            if (jsonObject.has("candidates")) {
+                JSONArray jsonArray = jsonObject.getJSONArray("candidates");
                 for (int i = 0; i < jsonArray.length(); i++) {
                     MyGooglePlaces poi = new MyGooglePlaces();
                     if (jsonArray.getJSONObject(i).has("name")) {
@@ -193,8 +194,8 @@ public class MyPlacesAdapter extends BaseAdapter implements Filterable, Location
                                 }
                             }
                         }
-                        if (jsonArray.getJSONObject(i).has("vicinity")) {
-                            poi.setVicinity(jsonArray.getJSONObject(i).optString("vicinity"));
+                        if (jsonArray.getJSONObject(i).has("formatted_address")) {
+                            poi.setVicinity(jsonArray.getJSONObject(i).optString("formatted_address"));
                         }
                         if (jsonArray.getJSONObject(i).has("types")) {
                             JSONArray typesArray = jsonArray.getJSONObject(i).getJSONArray("types");
