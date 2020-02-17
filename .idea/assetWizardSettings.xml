@@ -23,7 +23,7 @@
                                 <PersistentState>
                                   <option name="values">
                                     <map>
-                                      <entry key="url" value="jar:file:/Applications/Android%20Studio.app/Contents/plugins/android/lib/android.jar!/images/material_design_icons/navigation/ic_more_vert_black_24dp.xml" />
+                                      <entry key="url" value="jar:file:/Applications/Android%20Studio.app/Contents/plugins/android/lib/android.jar!/images/material_design_icons/maps/ic_person_pin_circle_black_24dp.xml" />
                                     </map>
                                   </option>
                                 </PersistentState>
@@ -34,8 +34,8 @@
                         <option name="values">
                           <map>
                             <entry key="opacityPercent" value="83" />
-                            <entry key="outputName" value="dotted" />
-                            <entry key="sourceFile" value="$USER_HOME$" />
+                            <entry key="outputName" value="person_pin_black" />
+                            <entry key="sourceFile" value="$PROJECT_DIR$/app/src/main/res/drawable-v24/minus.svg" />
                           </map>
                         </option>
                       </PersistentState>

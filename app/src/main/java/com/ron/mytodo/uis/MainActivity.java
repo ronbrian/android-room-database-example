@@ -22,13 +22,12 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.ron.mytodo.Adapters.TasksAdapter;
 import com.ron.mytodo.Database.DatabaseClient;
 import com.ron.mytodo.MyPlacesAdapter;
+import com.ron.mytodo.R;
 import com.ron.mytodo.allTasks;
 import com.ron.mytodo.model.Task;
 import com.ron.mytodo.rest.ApiClient;
 import com.ron.mytodo.rest.UserService;
 import com.ron.mytodo.viewmodel.MainViewModel;
-
-import net.simplifiedcoding.mytodo.R;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,6 +35,10 @@ import java.util.List;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+
+
+
+
 
 public class MainActivity extends AppCompatActivity {
 
@@ -198,7 +201,7 @@ public class MainActivity extends AppCompatActivity {
             protected void onPostExecute(Void aVoid) {
                 super.onPostExecute(aVoid);
                 finish();
-                startActivity(new Intent(getApplicationContext(), MainActivity.class));
+                //startActivity(new Intent(getApplicationContext(), MainActivity.class));
                 Toast.makeText(getApplicationContext(), "Saved", Toast.LENGTH_LONG).show();
             }
 

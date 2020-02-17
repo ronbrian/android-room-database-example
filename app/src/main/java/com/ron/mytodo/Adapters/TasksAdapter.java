@@ -8,10 +8,9 @@ import android.widget.TextView;
 
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.ron.mytodo.R;
 import com.ron.mytodo.model.Task;
 import com.ron.mytodo.uis.UpdateTaskActivity;
-
-import net.simplifiedcoding.mytodo.R;
 
 import java.util.List;
 

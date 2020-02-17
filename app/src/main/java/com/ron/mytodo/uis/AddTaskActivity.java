@@ -2,9 +2,13 @@ package com.ron.mytodo.uis;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.ActionBar;
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.graphics.Color;
 import android.location.Address;
 import android.location.Location;
@@ -14,7 +18,9 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -22,6 +28,7 @@ import android.widget.AdapterView;
 import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -38,14 +45,15 @@ import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.ron.mytodo.Database.DatabaseClient;
 import com.ron.mytodo.DirectionsJSONParser;
 import com.ron.mytodo.MyGooglePlaces;
 import com.ron.mytodo.MyPlacesAdapter;
+import com.ron.mytodo.R;
 import com.ron.mytodo.model.Task;
 import com.ron.mytodo.rest.UserService;
-
-import net.simplifiedcoding.mytodo.R;
+import com.ron.mytodo.uis.auth.LoginActivity;
 
 import org.json.JSONObject;
 
@@ -75,6 +83,7 @@ public class AddTaskActivity extends AppCompatActivity implements LocationListen
     String TAG = "placeautocomplete";
     TextView txtView;
     String LocationLatLng, locationCoord ;
+    private static DecimalFormat df = new DecimalFormat("0.00");
 
     protected LocationManager locationManager;
     protected LocationListener locationListener;
@@ -92,10 +101,15 @@ public class AddTaskActivity extends AppCompatActivity implements LocationListen
 
     MarkerOptions options = new MarkerOptions();
     MarkerOptions options2 = new MarkerOptions();
+    RelativeLayout relativeLayout1;
 
 
     private EditText editTextTask, editTextDesc, editTextFinishBy, editTextLocation;
-    private ImageView imageviewLocationIcon1, imageviewLocationIcon;
+    private ImageView imageviewLocationIcon1, imageviewLocationIcon,imageviewLocationIcon2;
+    private TextView textViewDistance, textViewTo, textViewFrom;
+    private FloatingActionButton btnRedirecttoViewUsers;
+    
+
 
     @SuppressLint("MissingPermission")
     @Override
@@ -115,8 +129,16 @@ public class AddTaskActivity extends AppCompatActivity implements LocationListen
         editTextDesc = findViewById(R.id.editTextDesc);
         editTextFinishBy = findViewById(R.id.editTextFinishBy);
         editTextLocation = findViewById(R.id.editTextLocation);
-        imageviewLocationIcon = findViewById(R.id.imageView2);
         imageviewLocationIcon1 = findViewById(R.id.imageView1);
+        imageviewLocationIcon2 = findViewById(R.id.imageView1);
+        textViewFrom = findViewById(R.id.textViewFrom);
+        textViewTo = findViewById(R.id.textViewTo);;
+        textViewDistance = findViewById(R.id.textViewDistance);
+        relativeLayout1 = findViewById(R.id.relativeLayout1);
+
+        btnRedirecttoViewUsers = findViewById(R.id.floatingActionButton);
+
+
 
 
 
@@ -124,8 +146,7 @@ public class AddTaskActivity extends AppCompatActivity implements LocationListen
         places2=(AutoCompleteTextView)findViewById(R.id.places2);
 
         places2.setVisibility(View.GONE);//makes it disappear
-        imageviewLocationIcon.setVisibility(View.GONE);//makes it disappear
-        imageviewLocationIcon1.setVisibility(View.GONE);//makes it disappear
+        relativeLayout1.setVisibility(View.GONE);//makes it disappear
 
 
         adapter=new MyPlacesAdapter(AddTaskActivity.this);
@@ -151,18 +172,23 @@ public class AddTaskActivity extends AppCompatActivity implements LocationListen
                 options.position(myLocation);
                 options.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
                 mMap.addMarker(options.title(googlePlaces.getName())).showInfoWindow();
+                textViewFrom.setText(googlePlaces.getName());
 
 
 
                 places2.setVisibility(View.VISIBLE);//makes it reappear
-                imageviewLocationIcon.setVisibility(View.VISIBLE);//makes it disappear
-                imageviewLocationIcon1.setVisibility(View.VISIBLE);//makes it disappear
 
 
 
-
-
-
+            }
+        });
+        
+        
+        btnRedirecttoViewUsers.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(AddTaskActivity.this, viewUsersLocation.class);
+                startActivity(intent);
             }
         });
 
@@ -182,6 +208,7 @@ public class AddTaskActivity extends AppCompatActivity implements LocationListen
                 options2.position(myLocation2);
                 options2.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
                 mMap.addMarker(options2.title(googlePlaces.getName())).showInfoWindow();
+                textViewTo.setText(googlePlaces.getName());
 
 
                 LatLng origin = myLocation;
@@ -215,7 +242,7 @@ public class AddTaskActivity extends AppCompatActivity implements LocationListen
 
                 int width = getResources().getDisplayMetrics().widthPixels;
                 int height = getResources().getDisplayMetrics().heightPixels;
-                int padding = (int) (width * 0.10); // offset from edges of the map 10% of screen
+                int padding = (int) (width * 0.35); // offset from edges of the map 10% of screen
 
 
                 LatLngBounds NAIROBI = builder.build();
@@ -224,6 +251,11 @@ public class AddTaskActivity extends AppCompatActivity implements LocationListen
 
 
                 Double dist = CalculationByDistance(origin, dest);
+                String dist1 = df.format(dist);
+
+                textViewDistance.setText(dist1+" Km");
+
+                relativeLayout1.setVisibility(View.VISIBLE);//makes it disappear
 
 
 
@@ -337,6 +369,32 @@ public class AddTaskActivity extends AppCompatActivity implements LocationListen
         mMap.moveCamera(center);
         mMap.animateCamera(zoom);
 
+
+        /*//IconGenerator iconGen = new IconGenerator(this);
+        IconGenerator iconFactory =  new IconGenerator(this);
+        MarkerOptions markerOptions = new MarkerOptions().
+                icon(BitmapDescriptorFactory.fromBitmap(iconFactory.makeIcon("Custom text"))).
+                position(new LatLng(-1.2937, 36.7967)).
+                anchor(iconFactory.getAnchorU(), iconFactory.getAnchorV());
+
+        mMap.addMarker(markerOptions).showInfoWindow();
+
+
+*/
+
+
+        View marker = ((LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.custom_marker_layout, null);
+        TextView numTxt = (TextView) marker.findViewById(R.id.num_txt);
+
+
+        //SET WHATEVER TEXT YOU WANT TO DISPLAY ON THE MARKER
+        numTxt.setText("AA");
+
+        Marker customMarker = mMap.addMarker(new MarkerOptions()
+                .position(myLocation)
+                .title("Title")
+                .snippet("Description")
+                .icon(BitmapDescriptorFactory.fromBitmap(createDrawableFromView(this, marker))));
 
 
         //mMap.setMinZoomPreference(15);
@@ -609,7 +667,7 @@ public class AddTaskActivity extends AppCompatActivity implements LocationListen
 
         // Sensor enabled
         String sensor = "sensor=false";
-        String mode = "mode=driving";
+        String mode = "mode=walking";
         // Building the parameters to the web service
         String parameters = str_origin + "&" + str_dest + "&" + sensor + "&" + mode;
 
@@ -689,8 +747,25 @@ public class AddTaskActivity extends AppCompatActivity implements LocationListen
         Log.i("Radius Value", "" + valueResult + "   KM  " + kmInDec
                 + " Meter   " + meterInDec);
 
-        return Radius * c;
+        return Radius * c +kmInDec;
     }
+
+
+    public static Bitmap createDrawableFromView(Context context, View view) {
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        ((Activity) context).getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+        view.setLayoutParams(new ActionBar.LayoutParams(ActionBar.LayoutParams.WRAP_CONTENT, ActionBar.LayoutParams.WRAP_CONTENT));
+        view.measure(displayMetrics.widthPixels, displayMetrics.heightPixels);
+        view.layout(0, 0, displayMetrics.widthPixels, displayMetrics.heightPixels);
+        view.buildDrawingCache();
+        Bitmap bitmap = Bitmap.createBitmap(view.getMeasuredWidth(), view.getMeasuredHeight(), Bitmap.Config.ARGB_8888);
+
+        Canvas canvas = new Canvas(bitmap);
+        view.draw(canvas);
+
+        return bitmap;
+    }
+
 
 
 

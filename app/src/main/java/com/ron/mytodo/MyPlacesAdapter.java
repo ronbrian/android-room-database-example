@@ -16,8 +16,6 @@ import android.widget.Filter;
 import android.widget.Filterable;
 import android.widget.TextView;
 
-import net.simplifiedcoding.mytodo.R;
-
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -153,10 +151,6 @@ public class MyPlacesAdapter extends BaseAdapter implements Filterable, Location
         }
         return   parseGoogleParse(sb.toString());
     }
-
-
-
-
 
 
     // method to parse the json returned by googleplaces api

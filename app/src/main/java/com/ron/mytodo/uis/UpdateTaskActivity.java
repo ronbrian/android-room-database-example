@@ -34,10 +34,9 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.ron.mytodo.Database.DatabaseClient;
 import com.ron.mytodo.DirectionsJSONParser;
+import com.ron.mytodo.R;
 import com.ron.mytodo.model.Task;
 import com.ron.mytodo.rest.UserService;
-
-import net.simplifiedcoding.mytodo.R;
 
 import org.json.JSONObject;
 
