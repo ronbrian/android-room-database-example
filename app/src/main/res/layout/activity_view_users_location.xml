@@ -19,17 +19,5 @@
         android:layout_marginBottom="239dp"
         tools:context="com.example.mapwithmarker.MapsMarkerActivity" />
 
-    <TextView
-        android:id="@+id/textView"
-        android:layout_width="135dp"
-        android:layout_height="32dp"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentBottom="true"
-        android:layout_marginEnd="137dp"
-        android:layout_marginRight="137dp"
-        android:layout_marginBottom="136dp"
-        android:text="..." />
-
 
 </RelativeLayout>

@@ -3,9 +3,14 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
-        android:id="@+id/action_settings"
+        android:id="@+id/actionViewOtherUsers"
         android:orderInCategory="100"
-        android:title="my menu Item!"
+        android:title="View Other Users"
+        app:showAsAction="never"/>
+    <item
+        android:id="@+id/actionEditMyInfo"
+        android:orderInCategory="100"
+        android:title="Edit My Info"
         app:showAsAction="never"/>
 
 

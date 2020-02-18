@@ -33,6 +33,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -51,9 +52,9 @@ import com.ron.mytodo.DirectionsJSONParser;
 import com.ron.mytodo.MyGooglePlaces;
 import com.ron.mytodo.MyPlacesAdapter;
 import com.ron.mytodo.R;
+import com.ron.mytodo.editUser;
 import com.ron.mytodo.model.Task;
 import com.ron.mytodo.rest.UserService;
-import com.ron.mytodo.uis.auth.LoginActivity;
 
 import org.json.JSONObject;
 
@@ -108,6 +109,8 @@ public class AddTaskActivity extends AppCompatActivity implements LocationListen
     private ImageView imageviewLocationIcon1, imageviewLocationIcon,imageviewLocationIcon2;
     private TextView textViewDistance, textViewTo, textViewFrom;
     private FloatingActionButton btnRedirecttoViewUsers;
+
+
     
 
 
@@ -116,6 +119,10 @@ public class AddTaskActivity extends AppCompatActivity implements LocationListen
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_task);
+
+        Toolbar myToolbar = (Toolbar) findViewById(R.id.my_toolbar);
+        setSupportActionBar(myToolbar);
+
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
@@ -342,9 +349,13 @@ public class AddTaskActivity extends AppCompatActivity implements LocationListen
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+        if (id == R.id.actionViewOtherUsers) {
+            Intent intent = new Intent(this, viewUsersLocation.class);
+            startActivity(intent);
         }
+        if (id == R.id.actionEditMyInfo) {
+            Intent intent = new Intent(this, editUser.class);
+            startActivity(intent);        }
         return super.onOptionsItemSelected(item);
     }
 

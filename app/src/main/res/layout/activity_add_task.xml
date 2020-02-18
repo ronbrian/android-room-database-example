@@ -6,6 +6,18 @@
     android:layout_height="match_parent"
     android:background="@android:color/white"
     tools:context="com.ron.mytodo.uis.AddTaskActivity">
+
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/my_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="?attr/colorPrimary"
+        android:elevation="4dp"
+        app:menu="@menu/menu_main"
+        android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
+        app:popupTheme="@style/ThemeOverlay.AppCompat.Light"/>
+
     <TextView
 
         android:id="@+id/txtView"

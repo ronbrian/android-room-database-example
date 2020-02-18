@@ -1,13 +1,9 @@
 package com.ron.mytodo.uis;
 
-import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.location.Address;
@@ -15,15 +11,14 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
-import android.provider.Settings;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import androidx.appcompat.app.AlertDialog;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.gms.maps.CameraUpdate;
@@ -35,16 +30,25 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 import com.ron.mytodo.R;
+import com.ron.mytodo.User;
 
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 import java.util.List;
 
-public class viewUsersLocation extends AppCompatActivity implements LocationListener, OnMapReadyCallback {
+public class viewUsersLocation extends AppCompatActivity implements  OnMapReadyCallback {
     private GoogleMap mMap;
     String LocationLatLng, locationCoord ;
     private static DecimalFormat df = new DecimalFormat("0.00");
-    protected LocationManager locationManager;
+
     protected LocationListener locationListener;
     protected Context context;
     protected String latitude, longitude;
@@ -57,7 +61,24 @@ public class viewUsersLocation extends AppCompatActivity implements LocationList
     MarkerOptions options = new MarkerOptions();
     MarkerOptions options2 = new MarkerOptions();
     TextView textView;
-    Context mContext;
+    Button button2;
+
+    private static final long MIN_DISTANCE_CHANGE_FOR_UPDATES = 1;
+    private static final long MIN_TIME_BW_UPDATES = 1;
+    protected LocationManager mlocationManager;
+
+    private FirebaseAuth auth;
+    String Semail,Spassword,Susername;
+
+    private DatabaseReference mFirebaseDatabase;
+    private FirebaseDatabase mFirebaseInstance;
+
+    public List<String> users = new ArrayList<String>();
+
+
+
+
+
 
 
 
@@ -67,30 +88,18 @@ public class viewUsersLocation extends AppCompatActivity implements LocationList
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_view_users_location);
 
-        mContext=this;
-        locationManager=(LocationManager) mContext.getSystemService(Context.LOCATION_SERVICE);
-        locationManager.requestLocationUpdates( LocationManager.GPS_PROVIDER,
-                2000,
-                10, locationListenerGPS);
-        isLocationEnabled();
 
-        textView=findViewById(R.id.textView);
 
-        //getting current location
 
-        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    Activity#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for Activity#requestPermissions for more details.
-            return;
-        }
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
+        LocationManager mLocationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
 
+
+        mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 10,
+                10, mLocationListener);
+
+
+
+      
 
 
 
@@ -98,23 +107,96 @@ public class viewUsersLocation extends AppCompatActivity implements LocationList
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
+        auth = FirebaseAuth.getInstance();
+
+
+
+        mFirebaseInstance = FirebaseDatabase.getInstance();
+
+        // get reference to 'users' node
+        mFirebaseDatabase = mFirebaseInstance.getReference("users");
+
+        // store app title to 'app_title' node
+        //mFirebaseInstance.getReference("Location View").setValue("Realtime Database");
 
 
 
 
+
+
+        fetchLocations();
 
 
     }
 
-
-    LocationListener locationListenerGPS=new LocationListener() {
+    private final LocationListener mLocationListener = new LocationListener() {
+        @SuppressLint("MissingPermission")
         @Override
-        public void onLocationChanged(android.location.Location location) {
-            double latitude=location.getLatitude();
-            double longitude=location.getLongitude();
-            String msg="New Latitude: "+latitude + "New Longitude: "+longitude;
-            Toast.makeText(mContext,msg,Toast.LENGTH_LONG).show();
+        public void onLocationChanged(final Location location) {
+            //textView.setText(""+location.getLatitude());  //test whether it's working
+
+            LocationManager mLocationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+
+       /*     View marker = ((LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.custom_marker_layout, null);
+
+
+            LatLng myLocation = new LatLng(location.getLatitude(),location.getLongitude());
+            TextView numTxt = (TextView) marker.findViewById(R.id.num_txt);
+
+            //SET WHATEVER TEXT YOU WANT TO DISPLAY ON THE MARKER
+            numTxt.setText("AA");
+
+            Marker customMarker = mMap.addMarker(new MarkerOptions()
+                    .position(myLocation)
+                    .title("Title")
+                    .snippet("Description")
+                    .icon(BitmapDescriptorFactory.fromBitmap(createDrawableFromView(viewUsersLocation.this, marker))));
+*/
+            String locationn = (location.getLatitude()+","+location.getLongitude());
+
+            UpdateLocation(locationn);
+
+
+            mLocationManager.requestLocationUpdates(
+                    LocationManager.GPS_PROVIDER, 50, 10, mLocationListener);
         }
+
+
+        private void UpdateLocation(String location) {
+
+           // Log.e("TAG", "this the email"+auth.getCurrentUser().getEmail());
+
+            Query query = mFirebaseDatabase.orderByChild("email").equalTo(auth.getCurrentUser().getEmail());
+            query.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    for (DataSnapshot  ds: dataSnapshot.getChildren()){
+                        ds.getRef().child("location").setValue(location);
+
+
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                }
+            });
+            // In real apps this userId should be fetched
+            // by implementing firebase auth
+            //mFirebaseDatabase.child("users").child(auth.getCurrentUser().getUid()).child("latitude").setValue(latitude);
+            //mFirebaseDatabase.child("users").child(auth.getCurrentUser().getUid()).child("longitude").setValue(longitude);
+
+            //mFirebaseDatabase.updateChildren();
+
+//            mFirebaseDatabase.child("users").child(userId).child("username").setValue(name);
+
+
+
+        }
+
+
+
 
         @Override
         public void onStatusChanged(String provider, int status, Bundle extras) {
@@ -129,15 +211,10 @@ public class viewUsersLocation extends AppCompatActivity implements LocationList
         @Override
         public void onProviderDisabled(String provider) {
 
+
+
         }
     };
-
-
-    protected void onResume(){
-        super.onResume();
-        isLocationEnabled();
-    }
-
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
@@ -148,7 +225,7 @@ public class viewUsersLocation extends AppCompatActivity implements LocationList
 
         mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
         LatLng myLocation = new LatLng(-1.2937,36.7981);
-        //mMap.moveCamera(CameraUpdateFactory.newLatLng(myLocation));
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(myLocation));
 
         CameraUpdate center= CameraUpdateFactory.newLatLng(new LatLng(myLocation.latitude,myLocation.longitude));
 
@@ -178,7 +255,7 @@ public class viewUsersLocation extends AppCompatActivity implements LocationList
     }
 
 
-    @Override
+   /* @Override
     public void onLocationChanged(Location location) {
         this.location = location.getLatitude()+", "+location.getLongitude();
 
@@ -186,7 +263,7 @@ public class viewUsersLocation extends AppCompatActivity implements LocationList
         longitude1 = location.getLongitude();
         LatLng myLocation = new LatLng(location.getLatitude(),location.getLongitude());
 
-        textView.setText(""+location.getLatitude()+location.getLongitude());
+        textView.setText(""+location.getLatitude());
 
         View marker = ((LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.custom_marker_layout, null);
         TextView numTxt = (TextView) marker.findViewById(R.id.num_txt);
@@ -205,61 +282,7 @@ public class viewUsersLocation extends AppCompatActivity implements LocationList
 
     }
 
-
-    private void isLocationEnabled() {
-
-        if(!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)){
-            AlertDialog.Builder alertDialog=new AlertDialog.Builder(mContext);
-            alertDialog.setTitle("Enable Location");
-            alertDialog.setMessage("Your locations setting is not enabled. Please enabled it in settings menu.");
-            alertDialog.setPositiveButton("Location Settings", new DialogInterface.OnClickListener(){
-                public void onClick(DialogInterface dialog, int which){
-                    Intent intent=new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-                    startActivity(intent);
-                }
-            });
-            alertDialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener(){
-                public void onClick(DialogInterface dialog, int which){
-                    dialog.cancel();
-                }
-            });
-            AlertDialog alert=alertDialog.create();
-            alert.show();
-        }
-        else{
-            AlertDialog.Builder alertDialog=new AlertDialog.Builder(mContext);
-            alertDialog.setTitle("Confirm Location");
-            alertDialog.setMessage("Your Location is enabled, please enjoy");
-            alertDialog.setNegativeButton("Back to interface",new DialogInterface.OnClickListener(){
-                public void onClick(DialogInterface dialog, int which){
-                    dialog.cancel();
-                }
-            });
-            AlertDialog alert=alertDialog.create();
-            alert.show();
-        }
-    }
-
-
-
-
-    @Override
-    public void onProviderDisabled(String provider) {
-        Log.d("Latitude", "disable");
-    }
-
-    @Override
-    public void onProviderEnabled(String provider) {
-        Log.d("Latitude", "enable");
-    }
-
-    @Override
-    public void onStatusChanged(String provider, int status, Bundle extras) {
-        Log.d("Latitude", "status");
-    }
-
-
-
+  */
 
 
 
@@ -309,6 +332,62 @@ public class viewUsersLocation extends AppCompatActivity implements LocationList
 
         return bitmap;
     }
+
+
+    public void fetchLocations(){
+        List<User> locationlist = new ArrayList<>();
+        mFirebaseDatabase.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for (DataSnapshot dataSnapshot1: dataSnapshot.getChildren()){
+                    //String _location = dataSnapshot1.getValue(String.class);
+                   // locationlist.add(_location);
+                    User user = dataSnapshot1.getValue(User.class);
+//                    locationlist.add(user.location);
+
+                    String[] parts1 = user.location.split(",");
+                    double lat = Double.valueOf(parts1[0]);
+                    double lng = Double.valueOf(parts1[1]);
+
+                    View marker = ((LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.custom_marker_layout, null);
+
+
+
+
+                    LatLng myLocation = new LatLng(lat,lng);
+                    TextView numTxt = (TextView) marker.findViewById(R.id.num_txt);
+
+                    //SET WHATEVER TEXT YOU WANT TO DISPLAY ON THE MARKER
+                    numTxt.setText(user.username);
+
+                    Marker customMarker = mMap.addMarker(new MarkerOptions()
+                            .position(myLocation)
+                            .title("Title")
+                            .snippet("Description")
+                            .icon(BitmapDescriptorFactory.fromBitmap(createDrawableFromView(viewUsersLocation.this, marker))));
+
+
+                    //Log.e("TAG", "list of location" +info);
+                }
+
+
+
+
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+        //mapLocations();
+
+
+
+
+    }
+
 
 
 
