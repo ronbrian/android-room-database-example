@@ -1,23 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content" >
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+
+    android:layout_height="match_parent" >
+
 
     <ImageView
-        android:layout_width="55dp"
-        android:layout_height="65dp"
-        android:src="@drawable/custom_marker" />
+        android:id="@+id/imageView"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:layout_marginTop="5dp"
+        android:background="@drawable/rounded_corner"
+        app:srcCompat="@drawable/ic_person_black_24dp" />
+
 
     <TextView
         android:id="@+id/num_txt"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="8dp"
+        android:layout_width="107dp"
+        android:layout_height="40dp"
+        android:layout_marginLeft="0dp"
         android:layout_marginTop="5dp"
-        android:gravity="center"
-        android:text="20"
-        android:textColor="#ce8223"
-        android:textSize="25dp"
+        android:layout_toRightOf="@+id/imageView"
+        android:autoSizeTextType="uniform"
+        android:background="@drawable/rounded_corner2"
+        android:maxLines="1"
+        android:text="Name"
+        android:textColor="@color/backgroundBlack"
+        android:textSize="18dp"
+
         android:textStyle="bold" />
+
 
 </RelativeLayout>

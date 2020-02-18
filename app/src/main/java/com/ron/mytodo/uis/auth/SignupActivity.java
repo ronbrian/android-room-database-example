@@ -167,7 +167,7 @@ public class SignupActivity extends AppCompatActivity {
             userId = mFirebaseDatabase.push().getKey();
         }
 
-        String locationn="null";
+        String locationn="";
 
 
         User user = new User(Semail, Susername, locationn);

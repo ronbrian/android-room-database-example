@@ -137,21 +137,6 @@ public class viewUsersLocation extends AppCompatActivity implements  OnMapReadyC
 
             LocationManager mLocationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
-       /*     View marker = ((LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.custom_marker_layout, null);
-
-
-            LatLng myLocation = new LatLng(location.getLatitude(),location.getLongitude());
-            TextView numTxt = (TextView) marker.findViewById(R.id.num_txt);
-
-            //SET WHATEVER TEXT YOU WANT TO DISPLAY ON THE MARKER
-            numTxt.setText("AA");
-
-            Marker customMarker = mMap.addMarker(new MarkerOptions()
-                    .position(myLocation)
-                    .title("Title")
-                    .snippet("Description")
-                    .icon(BitmapDescriptorFactory.fromBitmap(createDrawableFromView(viewUsersLocation.this, marker))));
-*/
             String locationn = (location.getLatitude()+","+location.getLongitude());
 
             UpdateLocation(locationn);
@@ -182,20 +167,8 @@ public class viewUsersLocation extends AppCompatActivity implements  OnMapReadyC
 
                 }
             });
-            // In real apps this userId should be fetched
-            // by implementing firebase auth
-            //mFirebaseDatabase.child("users").child(auth.getCurrentUser().getUid()).child("latitude").setValue(latitude);
-            //mFirebaseDatabase.child("users").child(auth.getCurrentUser().getUid()).child("longitude").setValue(longitude);
-
-            //mFirebaseDatabase.updateChildren();
-
-//            mFirebaseDatabase.child("users").child(userId).child("username").setValue(name);
-
-
 
         }
-
-
 
 
         @Override
@@ -234,55 +207,8 @@ public class viewUsersLocation extends AppCompatActivity implements  OnMapReadyC
         mMap.moveCamera(center);
         mMap.animateCamera(zoom);
 
-/*
-
-        View marker = ((LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.custom_marker_layout, null);
-        TextView numTxt = (TextView) marker.findViewById(R.id.num_txt);
-
-
-        //SET WHATEVER TEXT YOU WANT TO DISPLAY ON THE MARKER
-        numTxt.setText("AA");
-
-        Marker customMarker = mMap.addMarker(new MarkerOptions()
-                .position(myLocation)
-                .title("Title")
-                .snippet("Description")
-                .icon(BitmapDescriptorFactory.fromBitmap(createDrawableFromView(this, marker))));
-
-
-*/
 
     }
-
-
-   /* @Override
-    public void onLocationChanged(Location location) {
-        this.location = location.getLatitude()+", "+location.getLongitude();
-
-        latitude1 = location.getLatitude();
-        longitude1 = location.getLongitude();
-        LatLng myLocation = new LatLng(location.getLatitude(),location.getLongitude());
-
-        textView.setText(""+location.getLatitude());
-
-        View marker = ((LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.custom_marker_layout, null);
-        TextView numTxt = (TextView) marker.findViewById(R.id.num_txt);
-
-
-        //SET WHATEVER TEXT YOU WANT TO DISPLAY ON THE MARKER
-        numTxt.setText("01");
-
-        Marker customMarker = mMap.addMarker(new MarkerOptions()
-                .position(myLocation)
-                .title("Title")
-                .snippet("Description")
-                .icon(BitmapDescriptorFactory.fromBitmap(createDrawableFromView(this, marker))));
-
-
-
-    }
-
-  */
 
 
 
@@ -345,26 +271,39 @@ public class viewUsersLocation extends AppCompatActivity implements  OnMapReadyC
                     User user = dataSnapshot1.getValue(User.class);
 //                    locationlist.add(user.location);
 
-                    String[] parts1 = user.location.split(",");
-                    double lat = Double.valueOf(parts1[0]);
-                    double lng = Double.valueOf(parts1[1]);
+                    if (user.location.isEmpty()) {
 
-                    View marker = ((LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.custom_marker_layout, null);
+                    }else{
+                        String[] parts1 = user.location.split(",");
+                        double lat = Double.valueOf(parts1[0]);
+                        double lng = Double.valueOf(parts1[1]);
+
+
+                        View marker = ((LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.custom_marker_layout, null);
 
 
 
 
-                    LatLng myLocation = new LatLng(lat,lng);
-                    TextView numTxt = (TextView) marker.findViewById(R.id.num_txt);
+                        LatLng myLocation = new LatLng(lat,lng);
+                        TextView numTxt = (TextView) marker.findViewById(R.id.num_txt);
 
-                    //SET WHATEVER TEXT YOU WANT TO DISPLAY ON THE MARKER
-                    numTxt.setText(user.username);
+                        //SET WHATEVER TEXT YOU WANT TO DISPLAY ON THE MARKER
+                        numTxt.setText(user.username);
 
-                    Marker customMarker = mMap.addMarker(new MarkerOptions()
-                            .position(myLocation)
-                            .title("Title")
-                            .snippet("Description")
-                            .icon(BitmapDescriptorFactory.fromBitmap(createDrawableFromView(viewUsersLocation.this, marker))));
+                        Marker customMarker = mMap.addMarker(new MarkerOptions()
+                                .position(myLocation)
+                                .title(user.username)
+                                .snippet("Description")
+                                .icon(BitmapDescriptorFactory.fromBitmap(createDrawableFromView(viewUsersLocation.this, marker))));
+
+
+
+
+                    }
+
+
+
+
 
 
                     //Log.e("TAG", "list of location" +info);
