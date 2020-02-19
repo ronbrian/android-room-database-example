@@ -394,7 +394,7 @@ public class AddTaskActivity extends AppCompatActivity implements LocationListen
 */
 
 
-        View marker = ((LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.custom_marker_layout, null);
+      /*  View marker = ((LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.custom_marker_layout, null);
         TextView numTxt = (TextView) marker.findViewById(R.id.num_txt);
 
 
@@ -406,7 +406,7 @@ public class AddTaskActivity extends AppCompatActivity implements LocationListen
                 .title("Title")
                 .snippet("Description")
                 .icon(BitmapDescriptorFactory.fromBitmap(createDrawableFromView(this, marker))));
-
+*/
 
         //mMap.setMinZoomPreference(15);
         //mMap.setMaxZoomPreference(14.0f);
