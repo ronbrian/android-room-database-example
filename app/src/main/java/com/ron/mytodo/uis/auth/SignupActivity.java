@@ -13,12 +13,13 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
 import com.facebook.GraphRequest;
-import com.facebook.GraphResponse;
 import com.facebook.GraphRequest.GraphJSONObjectCallback;
+import com.facebook.GraphResponse;
 import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -53,6 +54,7 @@ public class SignupActivity extends AppCompatActivity {
     private FirebaseDatabase mFirebaseInstance;
 
     private String userId;
+    CallbackManager callbackManager = CallbackManager.Factory.create();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,7 +74,7 @@ public class SignupActivity extends AppCompatActivity {
         loginButton = (Button) findViewById(R.id.login_button);
 
         auth = FirebaseAuth.getInstance();
-        CallbackManager callbackManager = CallbackManager.Factory.create();
+
 
 
         mFirebaseInstance = FirebaseDatabase.getInstance();
@@ -187,7 +189,8 @@ public class SignupActivity extends AppCompatActivity {
                                         try {
                                             String email = object.getString("email");
                                             String name = object.getString("name");
-                                            inputEmail.setText(name);
+                                            inputEmail.setText(email);
+                                            inputUserName.setText(name);
 
                                         } catch (JSONException e) {
                                             e.printStackTrace();
@@ -302,4 +305,19 @@ public class SignupActivity extends AppCompatActivity {
         super.onResume();
         progressBar.setVisibility(View.GONE);
     }
+
+
+
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        callbackManager.onActivityResult(requestCode, resultCode, data);
+        super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    AccessToken accessToken = AccessToken.getCurrentAccessToken();
+    boolean isLoggedIn = accessToken != null && !accessToken.isExpired();
+
+
+
 }

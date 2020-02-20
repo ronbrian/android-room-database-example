@@ -120,7 +120,7 @@ public class LoginActivity extends AppCompatActivity {
                                         try {
                                             String email = object.getString("email");
                                             String name = object.getString("name");
-                                            inputEmail.setText(name);
+                                            inputEmail.setText(email);
 
                                         } catch (JSONException e) {
                                             e.printStackTrace();
@@ -222,6 +222,10 @@ public class LoginActivity extends AppCompatActivity {
 
     AccessToken accessToken = AccessToken.getCurrentAccessToken();
     boolean isLoggedIn = accessToken != null && !accessToken.isExpired();
+
+
+
+
 
     private void printKeyHash() {
         // Add code to print out the key hash
