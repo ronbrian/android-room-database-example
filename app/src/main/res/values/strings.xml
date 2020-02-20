@@ -1,8 +1,7 @@
 <resources>
-    <string name="app_name">My ToDo</string>
+    <string name="app_name">Location Sharing</string>
 
     <string name="google_maps_key" templateMergeStrategy="preserve" translatable="false">AIzaSyDTQ67ZZMnns_OlsSKe5qPqiqmeKRJuBSg</string>
-
 
     <string name="action_sign_in_short">Register</string>
     <string name="email">Email</string>
@@ -33,6 +32,8 @@
     <string name="btn_sign_out">Sign Out</string>
     <string name="lbl_forgot_password">Forgot password?</string>
     <string name="forgot_password_msg">registered Email Id to sent you password reset instructions.</string>
+    <string name="facebook_app_id">632533490840760</string>
+    <string name="fb_login_protocol_scheme">fb632533490840760</string>
 
 
 </resources>

@@ -13,6 +13,14 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.facebook.CallbackManager;
+import com.facebook.FacebookCallback;
+import com.facebook.FacebookException;
+import com.facebook.GraphRequest;
+import com.facebook.GraphResponse;
+import com.facebook.GraphRequest.GraphJSONObjectCallback;
+import com.facebook.login.LoginManager;
+import com.facebook.login.LoginResult;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
@@ -25,13 +33,18 @@ import com.google.firebase.database.ValueEventListener;
 import com.ron.mytodo.R;
 import com.ron.mytodo.User;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 
 public class SignupActivity extends AppCompatActivity {
     //private static final String TAG = "ThisClass";
     private static final String TAG = "$NAME";
+    private static final String EMAIL = "email";
+
 
     private EditText inputEmail, inputPassword,inputUserName;
-    private Button btnSignIn, btnSignUp, btnResetPassword;
+    private Button btnSignIn, btnSignUp, btnResetPassword,loginButton;
     private ProgressBar progressBar;
     private FirebaseAuth auth;
     String Semail,Spassword,Susername;
@@ -56,9 +69,10 @@ public class SignupActivity extends AppCompatActivity {
         inputPassword = (EditText) findViewById(R.id.password);
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
         btnResetPassword = (Button) findViewById(R.id.btn_reset_password);
+        loginButton = (Button) findViewById(R.id.login_button);
 
         auth = FirebaseAuth.getInstance();
-
+        CallbackManager callbackManager = CallbackManager.Factory.create();
 
 
         mFirebaseInstance = FirebaseDatabase.getInstance();
@@ -82,6 +96,7 @@ public class SignupActivity extends AppCompatActivity {
               startActivity(new Intent(SignupActivity.this, ResetPasswordActivity.class));
             }
         });
+
 
         btnSignIn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -148,6 +163,60 @@ public class SignupActivity extends AppCompatActivity {
 
             }
         });
+
+
+
+
+        callbackManager = CallbackManager.Factory.create();
+
+        LoginManager.getInstance().registerCallback(callbackManager,
+                new FacebookCallback<LoginResult>() {
+                    @Override
+                    public void onSuccess(LoginResult loginResult) {
+                        // App code
+
+
+                        GraphRequest request = GraphRequest.newMeRequest(
+                                loginResult.getAccessToken(),
+                                new GraphJSONObjectCallback() {
+                                    @Override
+                                    public void onCompleted(JSONObject object, GraphResponse response) {
+                                        Log.v("LoginActivity", response.toString());
+
+                                        // Application code
+                                        try {
+                                            String email = object.getString("email");
+                                            String name = object.getString("name");
+                                            inputEmail.setText(name);
+
+                                        } catch (JSONException e) {
+                                            e.printStackTrace();
+                                        }
+
+                                    }
+                                });
+                        Bundle parameters = new Bundle();
+                        parameters.putString("fields", "id,name,email,gender");
+                        request.setParameters(parameters);
+                        request.executeAsync();
+                    }
+
+                    @Override
+                    public void onCancel() {
+                        // App code
+                    }
+
+                    @Override
+                    public void onError(FacebookException exception) {
+                        // App code
+                    }
+                });
+
+
+
+
+
+
     }
 
 

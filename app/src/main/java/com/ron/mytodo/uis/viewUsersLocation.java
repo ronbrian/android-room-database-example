@@ -269,10 +269,27 @@ public class viewUsersLocation extends AppCompatActivity implements  OnMapReadyC
 
                 getDirectionsUrl(myLocation2,targetLocation );
 
-                relativeLayout1.setVisibility(View.VISIBLE);
+                LatLngBounds.Builder builder = new LatLngBounds.Builder();
+                builder.include(myLocation2);
+                builder.include(targetLocation);
+
+                int width = getResources().getDisplayMetrics().widthPixels;
+                int height = getResources().getDisplayMetrics().heightPixels;
+                int padding = (int) (width * 0.35); // offset from edges of the map 10% of screen
+
+
+                LatLngBounds NAIROBI = builder.build();
+
+                mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(NAIROBI,width,height,padding));
+
+
+
                 return false;
+
             }
+
         });
+
 
 
     }
@@ -303,6 +320,7 @@ public class viewUsersLocation extends AppCompatActivity implements  OnMapReadyC
 
         double distance = Radius*c + kmInDec;
         String dist1 = df.format(distance);
+        relativeLayout1.setVisibility(View.VISIBLE);
 
         return ""+dist1;
 
@@ -356,7 +374,7 @@ public class viewUsersLocation extends AppCompatActivity implements  OnMapReadyC
                         Marker customMarker = mMap.addMarker(new MarkerOptions()
                                 .position(myLocation)
                                 .title(user.username)
-                                .snippet("Description")
+                                .snippet("13 Km Away - 20 Min")
                                 .icon(BitmapDescriptorFactory.fromBitmap(createDrawableFromView(viewUsersLocation.this, marker))));
 
                         markers.add(customMarker);
