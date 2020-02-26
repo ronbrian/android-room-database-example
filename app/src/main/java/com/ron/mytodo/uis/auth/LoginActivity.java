@@ -32,6 +32,8 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.ron.mytodo.R;
+import com.ron.mytodo.rest.UserApiResponse;
+import com.ron.mytodo.rest.UserService;
 import com.ron.mytodo.uis.AddTaskActivity;
 
 import org.json.JSONException;
@@ -40,6 +42,13 @@ import org.json.JSONObject;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
+
+import okhttp3.OkHttpClient;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 
 public class LoginActivity extends AppCompatActivity {
@@ -51,6 +60,8 @@ public class LoginActivity extends AppCompatActivity {
     private Button btnSignup, btnLogin, btnReset,loginButton;
     CallbackManager callbackManager;
     private static final String EMAIL = "email";
+    public long uID = 12;
+    public String status1;
 
 
     @Override
@@ -196,17 +207,73 @@ public class LoginActivity extends AppCompatActivity {
                                 // signed in user can be handled in the listener.
                                 progressBar.setVisibility(View.GONE);
                                 if (!task.isSuccessful()) {
+                                   // task.getResult().getUser().getIdToken(false);
+
+
+
                                     // there was an error
+
+
                                     if (password.length() < 6) {
                                         inputPassword.setError(getString(R.string.minimum_password));
                                     } else {
                                         Toast.makeText(LoginActivity.this, getString(R.string.auth_failed), Toast.LENGTH_LONG).show();
                                     }
                                 } else {
+
+                                    Log.e("Token : ", task.getResult().getUser().getIdToken(false).getResult().getToken());
+
+
+                                    OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
+
+                                    Retrofit retrofit = new Retrofit.Builder()
+                                            .baseUrl("http://localhost:9789/")
+                                            .addConverterFactory(GsonConverterFactory.create())
+                                            .client(httpClient.build())
+                                            .build();
+
+                                    UserService service = retrofit.create(UserService.class);
+
+                                    String token = task.getResult().getUser().getIdToken(false).getResult().getToken();
+
+
+                                    Call<UserApiResponse> callSync = service.getUser( "Bearer "+token ,uID);
+
+                                    //try {
+                                        //Response<UserApiResponse> response = callSync.execute();
+                                        callSync.enqueue(new Callback<UserApiResponse>() {
+                                            @Override
+                                            public void onResponse(Call<UserApiResponse> call, Response<UserApiResponse> response) {
+                                                UserApiResponse apiResponse = response.body();
+                                                status1 = apiResponse.getStatus();
+
+                                                if(status1.equals("01")){     //01 is Response for Success, User is Found
+                                                    Intent intent = new Intent(LoginActivity.this, AddTaskActivity.class);
+                                                    startActivity(intent);
+                                                    finish();
+                                                }else{
+
+                                                }
+
+
+                                            }
+
+                                            @Override
+                                            public void onFailure(Call<UserApiResponse> call, Throwable t) {
+                                                Toast.makeText(LoginActivity.this, "User Cannot be Found", Toast.LENGTH_SHORT).show();
+
+                                            }
+                                        });
+
+
+
                                     Intent intent = new Intent(LoginActivity.this, AddTaskActivity.class);
                                     startActivity(intent);
                                     finish();
-                                }
+
+
+
+                   }
                             }
                         });
             }

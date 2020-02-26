@@ -341,7 +341,7 @@ public class UpdateTaskActivity extends AppCompatActivity implements OnMapReadyC
 
     @Override
     public void onStatusChanged(String provider, int status, Bundle extras) {
-        Log.d("Latitude", "status");
+        Log.d("Latitude", "User");
     }
 
 

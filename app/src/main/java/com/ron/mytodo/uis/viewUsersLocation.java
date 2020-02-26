@@ -47,6 +47,8 @@ import com.google.firebase.database.ValueEventListener;
 import com.ron.mytodo.DirectionsJSONParser;
 import com.ron.mytodo.R;
 import com.ron.mytodo.User;
+import com.ron.mytodo.rest.UserApiResponse;
+import com.ron.mytodo.rest.UserService;
 
 import org.json.JSONObject;
 
@@ -62,10 +64,20 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
+import okhttp3.OkHttpClient;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
+
 import static com.google.android.gms.maps.GoogleMap.MAP_TYPE_NORMAL;
 import static com.google.android.gms.maps.GoogleMap.OnMarkerClickListener;
 
 public class viewUsersLocation extends AppCompatActivity implements  OnMapReadyCallback {
+
+    private int id2 = 13;
+
     private GoogleMap mMap;
     private static DecimalFormat df = new DecimalFormat("0.00");
 
@@ -183,11 +195,22 @@ public class viewUsersLocation extends AppCompatActivity implements  OnMapReadyC
                     }
                 }
 
+
                 @Override
                 public void onCancelled(@NonNull DatabaseError databaseError) {
 
                 }
             });
+
+            User user1 = new User();
+
+
+            user1.setLocation(location);
+
+
+            updateLocation2(user1);
+
+
 
         }
 
@@ -369,11 +392,11 @@ public class viewUsersLocation extends AppCompatActivity implements  OnMapReadyC
                         TextView numTxt = (TextView) marker.findViewById(R.id.num_txt);
 
                         //SET WHATEVER TEXT YOU WANT TO DISPLAY ON THE MARKER
-                        numTxt.setText(user.username);
+                        numTxt.setText(user.name);
 
                         Marker customMarker = mMap.addMarker(new MarkerOptions()
                                 .position(myLocation)
-                                .title(user.username)
+                                .title(user.name)
                                 .snippet("13 Km Away - 20 Min")
                                 .icon(BitmapDescriptorFactory.fromBitmap(createDrawableFromView(viewUsersLocation.this, marker))));
 
@@ -572,6 +595,38 @@ public class viewUsersLocation extends AppCompatActivity implements  OnMapReadyC
         return data;
     }
 
+
+
+    public void updateLocation2(User myuser){
+
+        OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
+
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl("http://192.168.1.148:9786/")
+                .addConverterFactory(GsonConverterFactory.create())
+                .client(httpClient.build())
+                .build();
+
+        UserService service = retrofit.create(UserService.class);
+
+        String token = auth.getAccessToken(true).getResult().getToken();
+
+        Call<UserApiResponse> callSync = service.updateUser("Bearer "+token,id2,myuser);
+        callSync.enqueue(new Callback<UserApiResponse>() {
+            @Override
+            public void onResponse(Call<UserApiResponse> call, Response<UserApiResponse> response) {
+                if (response.isSuccessful()){
+                    Log.e("TAG", "it added successfully");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<UserApiResponse> call, Throwable t) {
+
+            }
+        });
+
+    }
 
 
 }

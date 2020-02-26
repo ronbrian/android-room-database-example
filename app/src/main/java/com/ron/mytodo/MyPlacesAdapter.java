@@ -272,7 +272,7 @@ public class MyPlacesAdapter extends BaseAdapter implements Filterable, Location
 
     @Override
     public void onStatusChanged(String provider, int status, Bundle extras) {
-        Log.d("Latitude", "status");
+        Log.d("Latitude", "User");
     }
 
 

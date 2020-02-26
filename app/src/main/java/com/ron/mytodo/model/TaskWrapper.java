@@ -14,7 +14,7 @@ public class TaskWrapper {
     private Boolean error;
     @SerializedName("message")
     private String message;
-    @SerializedName("status")
+    @SerializedName("User")
     private String status;
 
 

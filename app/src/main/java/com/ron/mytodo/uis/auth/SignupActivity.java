@@ -26,6 +26,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -50,7 +51,7 @@ public class SignupActivity extends AppCompatActivity {
     private FirebaseAuth auth;
     String Semail,Spassword,Susername;
 
-    private DatabaseReference mFirebaseDatabase;
+    private DatabaseReference mFirebaseDatabase,mFirebaseDatabase2;
     private FirebaseDatabase mFirebaseInstance;
 
     private String userId;
@@ -67,7 +68,7 @@ public class SignupActivity extends AppCompatActivity {
         btnSignIn = (Button) findViewById(R.id.sign_in_button);
         btnSignUp = (Button) findViewById(R.id.sign_up_button);
         inputEmail = (EditText) findViewById(R.id.email);
-        inputUserName = (EditText) findViewById(R.id.username);
+        inputUserName = (EditText) findViewById(R.id.name);
         inputPassword = (EditText) findViewById(R.id.password);
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
         btnResetPassword = (Button) findViewById(R.id.btn_reset_password);
@@ -81,6 +82,8 @@ public class SignupActivity extends AppCompatActivity {
 
         // get reference to 'users' node
         mFirebaseDatabase = mFirebaseInstance.getReference("users");
+        mFirebaseDatabase2 = mFirebaseInstance.getReference("uids");
+
 
         // store app title to 'app_title' node
         //mFirebaseInstance.getReference("Location View").setValue("Realtime Database");
@@ -236,15 +239,38 @@ public class SignupActivity extends AppCompatActivity {
         // In real apps this userId should be fetched
         // by implementing firebase auth
         if (TextUtils.isEmpty(userId)) {
-            userId = mFirebaseDatabase.push().getKey();
+
+            FirebaseUser currentFirebaseUser = FirebaseAuth.getInstance().getCurrentUser() ;
+            userId = currentFirebaseUser.getUid();
+
         }
 
         String locationn="";
+        String data = "data";
 
-
-        User user = new User(Semail, Susername, locationn);
+        User user = new User(Semail, Susername, locationn, userId);
 
         mFirebaseDatabase.child(userId).setValue(user);
+
+
+
+        User myuser = new User();
+
+        myuser.setName(Susername);
+        myuser.setEmail(Semail);
+        myuser.setLocation("");
+        myuser.setUserId(userId);
+
+
+        addUser2(myuser);
+
+
+       /*   try {
+            Response<UserApiResponse> response = callSync.execute();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }*/
+
 
         addUserChangeListener();
     }
@@ -319,5 +345,36 @@ public class SignupActivity extends AppCompatActivity {
     boolean isLoggedIn = accessToken != null && !accessToken.isExpired();
 
 
+
+    //Send user details using retrofit to rest API
+    public void addUser2(User myuser){
+//
+//        OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
+//
+//        Retrofit retrofit = new Retrofit.Builder()
+//                .baseUrl("http://192.168.1.148:9786/")
+//                .addConverterFactory(GsonConverterFactory.create())
+//                .client(httpClient.build())
+//                .build();
+//
+//        UserService service = retrofit.create(UserService.class);
+//
+//
+//        Call<UserApiResponse> callSync = service.addUser("Bearer "+token, myuser);
+//        callSync.enqueue(new Callback<UserApiResponse>() {
+//            @Override
+//            public void onResponse(Call<UserApiResponse> call, Response<UserApiResponse> response) {
+//                if (response.isSuccessful()){
+//                    Log.e("TAG", "it added successfully");
+//                }
+//            }
+//
+//            @Override
+//            public void onFailure(Call<UserApiResponse> call, Throwable t) {
+//
+//            }
+//        });
+
+    }
 
 }

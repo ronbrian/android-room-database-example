@@ -445,7 +445,7 @@ public class AddTaskActivity extends AppCompatActivity implements LocationListen
 
     @Override
     public void onStatusChanged(String provider, int status, Bundle extras) {
-        Log.d("Latitude", "status");
+        Log.d("Latitude", "User");
     }
 
 
